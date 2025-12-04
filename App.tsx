@@ -140,7 +140,7 @@ const App: React.FC = () => {
         
         {/* Left Column: Input (8 cols) */}
         <section className="lg:col-span-7 flex flex-col gap-6">
-          <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
             <h2 className="text-xl font-semibold mb-6 flex items-center text-white border-b border-slate-800 pb-4">
               <span className="bg-purple-600 text-white text-sm font-bold w-6 h-6 rounded-full flex items-center justify-center mr-3">1</span>
               Unggah Gambar & Pilih Opsi
@@ -281,7 +281,10 @@ const App: React.FC = () => {
 
         {/* Right Column: Output (4 cols) */}
         <section className="lg:col-span-5">
-           <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-sm sticky top-6 h-fit">
+           <div 
+             className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl sticky top-6 h-fit"
+             style={{ willChange: 'transform' }}
+           >
             <h2 className="text-xl font-semibold mb-6 flex items-center text-white border-b border-slate-800 pb-4">
               <span className="bg-slate-700 text-white text-sm font-bold w-6 h-6 rounded-full flex items-center justify-center mr-3">2</span>
               Hasil Prompt AI (English)
