@@ -1,8 +1,6 @@
 import { GoogleGenAI, Part } from "@google/genai";
 import { PromptState, GenerativePart } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 // Helper to convert File to a GenerativePart object with base64 data and mimeType
 export const fileToGenerativePart = async (file: File): Promise<GenerativePart> => {
   const mimeType = file.type;
@@ -35,6 +33,13 @@ export const generateDetailedPrompt = async (
   faceImagePart: GenerativePart | null,
   options: PromptState
 ): Promise<string> => {
+  
+  if (!process.env.API_KEY) {
+    throw new Error("Kunci API (API_KEY) tidak ditemukan. Pastikan Anda telah mengaturnya di Vercel dan melakukan redeploy.");
+  }
+  
+  // Initialize the AI client here to ensure it uses the latest environment variables
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   // Construct the text instruction based on overrides
   let userRequirements = "PENTING: Pengguna telah menentukan atribut berikut yang WAJIB ada dalam prompt akhir (jika nilai adalah 'default', analisis gambar asli):";
@@ -99,6 +104,7 @@ export const generateDetailedPrompt = async (
     return response.text;
   } catch (error) {
     console.error("Gemini Error:", error);
-    throw new Error("Terjadi kesalahan saat menghubungi AI. Pastikan file gambar tidak terlalu besar dan Kunci API Anda benar.");
+    // Rethrow the original error so the UI can handle it more specifically
+    throw error;
   }
 };
