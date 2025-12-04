@@ -35,13 +35,13 @@ export const generateDetailedPrompt = async (
 ): Promise<string> => {
   
   if (!process.env.API_KEY) {
-    throw new Error("Kunci API (API_KEY) tidak ditemukan. Pastikan Anda telah mengaturnya di Vercel dan melakukan redeploy.");
+    throw new Error("Kunci API (API_KEY) tidak ditemukan di Environment Variables. Pastikan Anda telah menambahkannya di Settings Vercel.");
   }
   
-  // Initialize the AI client here to ensure it uses the latest environment variables
+  // Initialize the AI client here
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
-  // Construct the text instruction based on overrides
+  // Construct the text instruction
   let userRequirements = "PENTING: Pengguna telah menentukan atribut berikut yang WAJIB ada dalam prompt akhir (jika nilai adalah 'default', analisis gambar asli):";
   
   if (options.gender !== 'default') userRequirements += `\n- Gender: ${options.gender}`;
@@ -93,18 +93,26 @@ export const generateDetailedPrompt = async (
   }
 
   try {
+    // Structure: Pass contents as an object with parts array. 
+    // Simplified structure to minimize compatibility issues.
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: [{ role: 'user', parts: parts }]
+      contents: {
+        parts: parts
+      }
     });
 
     if (!response.text) {
-        return "Gagal menghasilkan prompt. Model tidak memberikan respons teks.";
+        // Fallback checks just in case the getter fails but data exists
+        const candidates = response.candidates;
+        if (candidates && candidates.length > 0 && candidates[0].content && candidates[0].content.parts.length > 0) {
+           return candidates[0].content.parts[0].text || "No text found in response part.";
+        }
+        return "Gagal menghasilkan prompt. Model tidak memberikan respons teks yang valid.";
     }
     return response.text;
   } catch (error) {
-    console.error("Gemini Error:", error);
-    // Rethrow the original error so the UI can handle it more specifically
+    console.error("Gemini Raw Error:", error);
     throw error;
   }
 };

@@ -91,21 +91,30 @@ const App: React.FC = () => {
       const result = await generateDetailedPrompt(mainImagePart, faceImagePart, promptState);
       setGeneratedPrompt(result);
     } catch (err: any) {
-      console.error("Full error during generation:", err);
-      let errorMessage = "Terjadi kesalahan yang tidak diketahui.";
+      console.error("Application Error Catch:", err);
+      
+      let errorMessage = "Terjadi kesalahan.";
 
       if (err instanceof Error) {
+        // Display the actual error message from the SDK/API
         errorMessage = err.message;
       } else if (typeof err === 'string') {
         errorMessage = err;
-      } else if (err && typeof err === 'object' && err.message) {
-        errorMessage = String(err.message);
-      }
-      
-      if (errorMessage.toLowerCase().includes("api key") || errorMessage.toLowerCase().includes("credential")) {
-        errorMessage = "Kunci API tidak valid atau tidak ditemukan. Pastikan Anda telah mengaturnya di Vercel.";
+      } else {
+        // Fallback for non-standard error objects
+        try {
+           errorMessage = JSON.stringify(err);
+           if (errorMessage === '{}') errorMessage = String(err);
+        } catch {
+           errorMessage = "Unknown Error (Non-serializable)";
+        }
       }
 
+      // Add context if it seems like an API key issue
+      if (errorMessage.includes("API key") || errorMessage.includes("403") || errorMessage.includes("401")) {
+         errorMessage = `ERROR AUTH: ${errorMessage}\n\nSolusi: Cek 'Environment Variables' di Vercel. Pastikan 'API_KEY' sudah benar.`;
+      }
+      
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -272,7 +281,8 @@ const App: React.FC = () => {
              </div>
              
              {error && (
-               <div className="mt-4 p-3 bg-red-900/30 border border-red-500/50 text-red-200 text-sm rounded-lg">
+               <div className="mt-4 p-4 bg-red-950/50 border border-red-500/50 text-red-200 text-sm rounded-lg font-mono whitespace-pre-wrap break-words">
+                 <strong className="block mb-2 text-red-400">Terjadi Kesalahan:</strong>
                  {error}
                </div>
              )}
