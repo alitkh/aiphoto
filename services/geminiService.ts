@@ -34,12 +34,16 @@ export const generateDetailedPrompt = async (
   options: PromptState
 ): Promise<string> => {
   
-  if (!process.env.API_KEY) {
-    throw new Error("Kunci API (API_KEY) tidak ditemukan di Environment Variables. Pastikan Anda telah menambahkannya di Settings Vercel.");
+  // Retrieve API Key from process.env (injected by Vite at build time)
+  const apiKey = process.env.API_KEY;
+
+  // Strict check to ensure the key exists and is not an empty string
+  if (!apiKey || apiKey.trim() === '') {
+    throw new Error("Kunci API (API_KEY) tidak ditemukan atau kosong. Pastikan Environment Variable 'API_KEY' sudah diatur dengan benar di Vercel atau file .env.");
   }
   
-  // Initialize the AI client here
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // Initialize the AI client with the valid API key
+  const ai = new GoogleGenAI({ apiKey });
   
   // Construct the text instruction
   let userRequirements = "PENTING: Pengguna telah menentukan atribut berikut yang WAJIB ada dalam prompt akhir (jika nilai adalah 'default', analisis gambar asli):";
@@ -93,8 +97,6 @@ export const generateDetailedPrompt = async (
   }
 
   try {
-    // Structure: Pass contents as an object with parts array. 
-    // Simplified structure to minimize compatibility issues.
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
       contents: {
@@ -112,7 +114,7 @@ export const generateDetailedPrompt = async (
     }
     return response.text;
   } catch (error) {
-    console.error("Gemini Raw Error:", error);
+    console.error("Gemini API Error:", error);
     throw error;
   }
 };
