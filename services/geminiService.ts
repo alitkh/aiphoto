@@ -90,9 +90,7 @@ export const generateDetailedPrompt = async (
   try {
     const response = await ai.models.generateContent({
       model: "gemini-2.5-flash",
-      contents: {
-        parts: parts
-      }
+      contents: parts // Simplified the contents structure
     });
 
     if (!response.text) {
@@ -101,6 +99,6 @@ export const generateDetailedPrompt = async (
     return response.text;
   } catch (error) {
     console.error("Gemini Error:", error);
-    throw new Error("Terjadi kesalahan saat menghubungi AI. Pastikan file gambar tidak terlalu besar.");
+    throw new Error("Terjadi kesalahan saat menghubungi AI. Pastikan file gambar tidak terlalu besar dan Kunci API Anda benar.");
   }
 };

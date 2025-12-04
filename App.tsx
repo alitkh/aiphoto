@@ -91,7 +91,22 @@ const App: React.FC = () => {
       const result = await generateDetailedPrompt(mainImagePart, faceImagePart, promptState);
       setGeneratedPrompt(result);
     } catch (err: any) {
-      setError(err.message || "Terjadi kesalahan yang tidak diketahui.");
+      console.error("Full error during generation:", err);
+      let errorMessage = "Terjadi kesalahan yang tidak diketahui.";
+
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err && typeof err === 'object' && err.message) {
+        errorMessage = String(err.message);
+      }
+      
+      if (errorMessage.toLowerCase().includes("api key") || errorMessage.toLowerCase().includes("credential")) {
+        errorMessage = "Kunci API tidak valid atau tidak ditemukan. Pastikan Anda telah mengaturnya di Vercel.";
+      }
+
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
