@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Generator Prompt Foto Model",
+  "description": "Aplikasi untuk membuat prompt gambar AI yang detail berdasarkan upload foto dan kustomisasi parameter (Gender, Pose, Lighting, dll) menggunakan Gemini Vision.",
+  "requestFramePermissions": []
+}
